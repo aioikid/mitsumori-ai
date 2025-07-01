@@ -16,9 +16,10 @@ interface EstimateData {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params // paramsを使用
     const body = await request.json() as EstimateData
 
     if (!body.customerName) {
@@ -39,8 +40,8 @@ export async function POST(
     const generator = new PDFGenerator()
     const pdfBytes = generator.generateEstimatePDF(body)
 
-    // ファイル名を生成
-    const fileName = `見積書_${body.customerName}_${new Date().toISOString().split('T')[0]}.pdf`
+    // ファイル名を生成（見積書IDを含める）
+    const fileName = `見積書_${body.customerName}_${id}_${new Date().toISOString().split('T')[0]}.pdf`
 
     // PDFをレスポンスとして返す
     return new NextResponse(pdfBytes, {
@@ -63,11 +64,12 @@ export async function POST(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   return NextResponse.json({ 
     message: 'PDF Generation API',
-    estimateId: params.id 
+    estimateId: id 
   })
 }
 

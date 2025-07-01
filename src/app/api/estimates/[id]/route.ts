@@ -22,10 +22,10 @@ const mockEstimates: { [key: string]: EstimateData } = {}
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
 
     // TODO: Supabaseからデータを取得
     const estimate = mockEstimates[id]
@@ -50,10 +50,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
 
     // TODO: Supabaseでデータを更新
@@ -87,10 +87,10 @@ export async function PUT(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await params
     const body = await request.json()
 
     // 新しい見積書を作成

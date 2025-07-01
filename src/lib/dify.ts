@@ -6,7 +6,9 @@ interface DifyConfig {
 
 interface DifyResponse {
   success: boolean
-  data?: any
+  data?: {
+    items: ExtractedItem[]
+  }
   error?: string
 }
 

@@ -41,9 +41,9 @@ export async function POST(request: NextRequest) {
       ? await difyClient.mockProcessPDF(file.name)
       : await difyClient.processPDF(buffer, file.name)
 
-    if (!difyResponse.success) {
+    if (!difyResponse.success || !difyResponse.data) {
       return NextResponse.json(
-        { error: `PDF処理エラー: ${difyResponse.error}` },
+        { error: `PDF処理エラー: ${difyResponse.error || 'データが取得できませんでした'}` },
         { status: 500 }
       )
     }
@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     const estimateId = 'est_' + Date.now()
 
     // 抽出されたデータにIDを追加
-    const extractedItems = difyResponse.data.items.map((item: any, index: number) => ({
+    const extractedItems = difyResponse.data.items.map((item: { itemName: string; quantity: number; unitCost: number }, index: number) => ({
       id: (index + 1).toString(),
       itemName: item.itemName,
       quantity: item.quantity,

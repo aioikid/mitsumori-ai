@@ -43,7 +43,7 @@ export class PDFGenerator {
     // フッター
     this.addFooter()
 
-    return this.doc.output('arraybuffer') as Uint8Array
+    return new Uint8Array(this.doc.output('arraybuffer') as ArrayBuffer)
   }
 
   private addHeader() {
@@ -75,7 +75,6 @@ export class PDFGenerator {
   private addItemsTable(items: EstimateItem[]) {
     const startY = 130
     const rowHeight = 10
-    const colWidths = [80, 20, 30, 30, 30] // 項目名, 数量, 単価, 小計
     const colX = [20, 100, 120, 150, 180]
 
     // テーブルヘッダー

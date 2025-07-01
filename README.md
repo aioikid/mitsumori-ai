@@ -1,36 +1,152 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# mitsumori.AI
 
-## Getting Started
+スマホのWebブラウザから仕入れ見積書PDFをアップロードし、自動的に項目・数量・原価を抽出して見積書を作成するWebアプリケーション
 
-First, run the development server:
+## 機能
 
+### 主要機能
+- **PDFアップロード**: スマホブラウザ（Safari）対応のPDFファイルアップロード
+- **自動データ抽出**: DifyAPIを使用したPDFからの項目・数量・原価の自動抽出
+- **見積書編集**: 抽出されたデータの確認・編集、顧客名・販売価格の入力
+- **PDF生成**: 完成した見積書のPDF出力・ダウンロード
+- **レスポンシブデザイン**: スマホ・タブレット・デスクトップ対応
+
+### 技術スタック
+- **フロントエンド**: Next.js 15, React 18, TypeScript, Tailwind CSS
+- **バックエンド**: Next.js API Routes
+- **PDF処理**: DifyAPI統合
+- **PDF生成**: jsPDF
+- **デプロイ**: Vercel対応
+
+## セットアップ
+
+### 前提条件
+- Node.js 18以上
+- npm または yarn
+
+### インストール
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# リポジトリをクローン
+git clone <repository-url>
+cd mitsumori-ai
+
+# 依存関係をインストール
+npm install
+
+# 環境変数を設定
+cp .env.example .env.local
+# .env.localファイルを編集してDifyAPIの設定を行う
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 環境変数
+```env
+# Dify API Configuration
+DIFY_API_URL=https://api.dify.ai/v1
+DIFY_API_KEY=your_dify_api_key
+DIFY_WORKFLOW_ID=your_workflow_id
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Environment
+NODE_ENV=development
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 開発サーバー起動
+```bash
+npm run dev
+```
+http://localhost:3000 でアクセス
 
-## Learn More
+### プロダクションビルド
+```bash
+npm run build
+npm start
+```
 
-To learn more about Next.js, take a look at the following resources:
+## API エンドポイント
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### POST /api/upload
+PDFファイルをアップロードし、DifyAPIで解析
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**リクエスト**:
+- Content-Type: multipart/form-data
+- Body: PDFファイル
 
-## Deploy on Vercel
+**レスポンス**:
+```json
+{
+  "success": true,
+  "estimateId": "est_1234567890",
+  "extractedData": {
+    "items": [
+      {
+        "id": "1",
+        "itemName": "商品A",
+        "quantity": 10,
+        "unitCost": 100,
+        "unitPrice": 100
+      }
+    ]
+  }
+}
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### GET /api/estimates/[id]
+見積書データの取得
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### PUT /api/estimates/[id]
+見積書データの更新
+
+### POST /api/estimates/[id]/pdf
+見積書PDFの生成・ダウンロード
+
+## デプロイ
+
+### Vercelデプロイ
+1. Vercelアカウントにログイン
+2. GitHubリポジトリを接続
+3. 環境変数を設定
+4. デプロイ実行
+
+### 環境変数設定（Vercel）
+- `DIFY_API_URL`: https://api.dify.ai/v1
+- `DIFY_API_KEY`: DifyのAPIキー
+- `DIFY_WORKFLOW_ID`: DifyのワークフローID
+- `NODE_ENV`: production
+
+## 使用方法
+
+1. **PDFアップロード**: 仕入れ見積書PDFをアップロード
+2. **データ確認**: 自動抽出された項目・数量・原価を確認
+3. **見積書編集**: 顧客名を入力し、販売価格を設定
+4. **PDF生成**: 完成した見積書をPDF形式でダウンロード
+
+## 開発情報
+
+### プロジェクト構成
+```
+mitsumori-ai/
+├── src/
+│   ├── app/
+│   │   ├── api/           # API Routes
+│   │   ├── globals.css    # グローバルスタイル
+│   │   ├── layout.tsx     # レイアウトコンポーネント
+│   │   └── page.tsx       # メインページ
+│   └── lib/
+│       ├── dify.ts        # DifyAPI統合
+│       └── pdf-generator.ts # PDF生成
+├── public/                # 静的ファイル
+├── .env.example          # 環境変数例
+├── vercel.json           # Vercelデプロイ設定
+└── README.md
+```
+
+### 主要コンポーネント
+- **メインページ** (`src/app/page.tsx`): ユーザーインターフェース
+- **DifyClient** (`src/lib/dify.ts`): PDF解析API統合
+- **PDFGenerator** (`src/lib/pdf-generator.ts`): 見積書PDF生成
+
+## ライセンス
+MIT License
+
+## サポート
+問題や質問がある場合は、GitHubのIssuesをご利用ください。
+
