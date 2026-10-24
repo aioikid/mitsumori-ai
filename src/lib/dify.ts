@@ -28,13 +28,17 @@ export class DifyClient {
   constructor() {
     this.config = {
       apiUrl: process.env.DIFY_API_URL || 'https://api.dify.ai/v1',
-      apiKey: process.env.DIFY_API_KEY || 'app-eNCwHzDD2U29g9v7d2jgRSnd',
+      apiKey: process.env.DIFY_API_KEY?.trim() || '',
       workflowId: process.env.DIFY_WORKFLOW_ID || 'CL4GuiaHyVu9SjoA'
     }
   }
 
   async processPDF(pdfBuffer: Buffer, fileName: string): Promise<DifyResponse> {
     try {
+      if (!this.config.apiKey) {
+        return { success: false, error: 'DIFY_API_KEY is not configured' }
+      }
+
       // PDFをBase64エンコード
       const base64PDF = pdfBuffer.toString('base64')
 
